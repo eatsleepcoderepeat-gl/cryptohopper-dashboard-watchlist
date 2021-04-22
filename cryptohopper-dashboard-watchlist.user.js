@@ -26,7 +26,7 @@
 var ENABLE_POSITION_TARGETS = true;
 
 // When enabled, will clear a watch target on doouobleclick.
-var EXPERIMENTAL_DOUBLE_CLICK_TO_CLEAR = false;
+var EXPERIMENTAL_DOUBLE_CLICK_TO_CLEAR = true;
 
 // Removes the annoying image of "hoppie" sticking his arm out from the side of the page.
 var REMOVE_HOPPIE = true;
@@ -37,6 +37,9 @@ var SHOW_BUY_RATE_IN_TRADING_VIEW = true;
 
 // Adds an absolute value to the Result column on the dashboard
 var ADD_ABSOLUTE_RESULT = true;
+
+// Add shift+click functionality for position checkboxes to allow selecting all positions of the same coin/token
+var SELECT_ALL_OPEN_POSITIONS = true;
 
 // You can add and remove items from this list at will or change around the colors.
 // I have only tested font awesome icons (with the prefix "fa-").
@@ -178,6 +181,9 @@ function initScript() {
       $('#openPosTableHolder tbody').on("destroyed", reInitAbsoluteResult);
     }
   }
+
+  // Add handling to allow the selection of all open positions by shift+clicking the checkbox for that position
+  if(SELECT_ALL_OPEN_POSITIONS && $('#openPosTableHolder').length) positionSelectionHandler();
 }
 
 function initChartMods() {
@@ -375,6 +381,46 @@ function watchForTableUpdates() {
     observer.disconnect();
   });
 }
+
+// Add handling to allow for holding down the shift key while clicking a position checkbox to select all positions of the same coin/token
+function positionSelectionHandler() {
+  var modifierPressed = false;
+
+  $(document).on('keydown keyup', function(e) { modifierPressed = e.shiftKey; });
+
+  function shiftClickHandler(e) {
+    if(modifierPressed && e.originalEvent !== undefined && e.originalEvent.isTrusted) {
+      var checkbox = $(this);
+      var ticker = checkbox.closest('td').next().text();
+      var checked = checkbox.prop("checked");
+
+      // Iterate through each position that has a ticker that matches the ticker for the checkbox we clicked on
+      $('#openPosTableHolder tbody td:contains(' + ticker + ')').closest('tr').find('input[name="bulkselection[]"]').not(checkbox).each(function() {
+        var el = $(this);
+        // Verify that our ticker is an exact match then update its checked value to match the checkbox we clicked
+        if(el.closest('td').next().text() == ticker) el.prop('checked', checked);
+      });
+    }
+  }
+
+  // Bind our event handler
+  $('#openPosTableHolder tbody input[name="bulkselection[]"]').on('click', shiftClickHandler);
+
+  function reInitShiftClickHandler() {
+    var rebindInterval = window.setInterval(function() {
+      var table = $('#openPosTableHolder tbody');
+      if(table.length) {
+        $('#openPosTableHolder tbody input[name="bulkselection[]"]').on('click', shiftClickHandler);
+        table.on('destroyed', reInitShiftClickHandler);
+        window.clearInterval(rebindInterval);
+      }
+    }, 200);
+  }
+
+  // If the table is destroyed, rebind our event handler to the newly recreated elements
+  $('#openPosTableHolder tbody input[name="bulkselection[]"]').on('destroyed', reInitShiftClickHandler);
+}
+
 function main() {
   if (window.location.pathname === "/chart/chart.php") {
     if (SHOW_BUY_RATE_IN_TRADING_VIEW) {
