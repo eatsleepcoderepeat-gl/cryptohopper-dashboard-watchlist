@@ -181,8 +181,8 @@ function initScript() {
       $('#openPosTableHolder tbody').on("destroyed", reInitAbsoluteResult);
     }
 
-  // Add handling to allow the selection of all open positions by shift+clicking the checkbox for that position
-  if(SELECT_ALL_OPEN_POSITIONS) positionSelectionHandler();
+    // Add handling to allow the selection of all open positions by shift+clicking the checkbox for that position
+    if(SELECT_ALL_OPEN_POSITIONS) positionSelectionHandler();
   }
 }
 
