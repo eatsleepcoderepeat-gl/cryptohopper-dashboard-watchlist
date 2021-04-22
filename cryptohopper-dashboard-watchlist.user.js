@@ -180,10 +180,10 @@ function initScript() {
       // Watch for when the table is destroyed so that we can recreate our mutation observer when this happens
       $('#openPosTableHolder tbody').on("destroyed", reInitAbsoluteResult);
     }
-  }
 
   // Add handling to allow the selection of all open positions by shift+clicking the checkbox for that position
-  if(SELECT_ALL_OPEN_POSITIONS && $('#openPosTableHolder').length) positionSelectionHandler();
+  if(SELECT_ALL_OPEN_POSITIONS) positionSelectionHandler();
+  }
 }
 
 function initChartMods() {
