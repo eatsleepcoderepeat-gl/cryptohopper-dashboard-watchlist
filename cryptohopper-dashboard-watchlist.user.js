@@ -168,7 +168,7 @@ function initScript() {
           if(table.length) {
             addAbsoluteResult(table);
             watchForTableUpdates();
-            table.on("destroyed", reInitAbsoluteResult);
+            table.on('destroyed', reInitAbsoluteResult);
             window.clearInterval(rebindInterval);
           }
         }, 200);
