@@ -26,7 +26,7 @@
 var ENABLE_POSITION_TARGETS = true;
 
 // When enabled, will clear a watch target on doouobleclick.
-var EXPERIMENTAL_DOUBLE_CLICK_TO_CLEAR = true;
+var EXPERIMENTAL_DOUBLE_CLICK_TO_CLEAR = false;
 
 // Removes the annoying image of "hoppie" sticking his arm out from the side of the page.
 var REMOVE_HOPPIE = true;
