@@ -163,21 +163,19 @@ function initScript() {
     // Add absolute values to the Result column
     if(ADD_ABSOLUTE_RESULT) {
       addAbsoluteResult($('#openPosTableHolder tbody'));
-      watchForTableUpdates(); // Here for now as a placeholder - move out of this if statement if/when other functions that depend on this observer are added
 
       function reInitAbsoluteResult() {
         var rebindInterval = window.setInterval(function() {
           var table = $('#openPosTableHolder tbody');
           if(table.length) {
             addAbsoluteResult(table);
-            watchForTableUpdates();
             table.on('destroyed', reInitAbsoluteResult);
             window.clearInterval(rebindInterval);
           }
         }, 200);
       }
 
-      // Watch for when the table is destroyed so that we can recreate our mutation observer when this happens
+      // Watch for when the table is destroyed so that we can recalculate and add the absolute results again
       $('#openPosTableHolder tbody').on("destroyed", reInitAbsoluteResult);
     }
 
@@ -340,11 +338,20 @@ function createWatchlistColumn() {
 }
 
 // Add absolute value to the Result column
-function addAbsoluteResult(node) {
-  $('td span[class*="rate_"]:visible:not(:contains("("))',node).each(function() {
+function addAbsoluteResult(node, direct) {
+  var target = direct ? node : $('td span[class*="rate_"]:visible:not(:contains("("))',node);
+  target.each(function() {
     var change = $(this).text().replace('%','');
     var cost = $(this).closest('td').prev().text();
-    $(this).text($(this).text() + ' (' + (change / 100 * cost).toFixed(2) + ')');
+    var el = $(this);
+    el.html(el.html() + ' <span>(' + (change / 100 * cost).toFixed(2) + ')</span>');
+    // When the result updates, recalculate the absolute result
+    $('>span',el).off().on('destroyed',function() {
+      // Pause added to ensure the element has fully updated before we recalculatte, and to prevent an infinite loop
+      window.setTimeout(function() {
+        addAbsoluteResult(el,true);
+      },1);
+    });
   });
 }
 
