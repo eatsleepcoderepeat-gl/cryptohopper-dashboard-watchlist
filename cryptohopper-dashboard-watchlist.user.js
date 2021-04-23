@@ -358,40 +358,6 @@ function addAbsoluteResult(node, direct) {
   });
 }
 
-// This function watches for updates on the position table when on the dashboard view
-function watchForTableUpdates() {
-  // The node to be monitored
-  var mutationTarget = $( '#openPosTableHolder tbody' )[0];
-
-  // Create an observer instance
-  var observer = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      var newNodes = mutation.addedNodes; // DOM NodeList
-      if(newNodes !== null) { // If there are new nodes added
-        var $nodes = $(newNodes); // jQuery set
-        $nodes.each(function() {
-          if(ADD_ABSOLUTE_RESULT) addAbsoluteResult($(this));
-        });
-      }
-    });    
-  });
-
-  // Configuration of the observer:
-  var config = { 
-    attributes: true, 
-    childList: true, 
-    characterData: true 
-  };
-   
-  // Pass in the mutation target node, as well as the observer options
-  observer.observe(mutationTarget, config);
-
-  // Clean up our mutation observer when the table is destroyed
-  $(mutationTarget).on('destroyed', function() {
-    observer.disconnect();
-  });
-}
-
 // Add handling to allow for holding down the shift key while clicking a position checkbox to select all positions of the same coin/token
 function positionSelectionHandler() {
   var modifierPressed = false;
