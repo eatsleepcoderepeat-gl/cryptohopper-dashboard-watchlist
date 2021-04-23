@@ -391,6 +391,7 @@ function positionSelectionHandler() {
   $('input[type="checkbox"]', table).on('click', shiftClickHandler);
 
   function reInitShiftClickHandler() {
+    var counter = 0;
     var rebindInterval = window.setInterval(function() {
       var newTable = $('#switchOpenPosTabs ~ .tab-content tbody:visible input[type="checkbox"]').closest('tbody:visible');
       if(newTable.length) {
@@ -398,6 +399,9 @@ function positionSelectionHandler() {
         newTable.on('destroyed', reInitShiftClickHandler);
         window.clearInterval(rebindInterval);
       }
+      counter++;
+      // Timeout after 5 mins
+      if(counter >= 1500) window.clearInterval(rebindInterval);
     }, 200);
   }
 
